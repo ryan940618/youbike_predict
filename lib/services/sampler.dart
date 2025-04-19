@@ -53,7 +53,12 @@ class SamplerService {
       }
     }
 
-    await LoggerService.writeLog(results);
+    final logEntry = {
+      'timestamp': DateTime.now().toIso8601String(),
+      'stations': results,
+    };
+
+    await LoggerService.writeLog([logEntry]);
     onLog("Logged 站點數量： ${results.length} @ ${DateTime.now()}");
   }
 

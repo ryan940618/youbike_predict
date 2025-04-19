@@ -6,7 +6,6 @@ class SettingsDialog extends StatefulWidget {
   final void Function(Map<String, dynamic>) onConfigChanged;
   final VoidCallback onStartLogging;
   final VoidCallback onStopLogging;
-  final VoidCallback onExport;
   final void Function(File importFile) onImport;
 
   const SettingsDialog({
@@ -14,7 +13,6 @@ class SettingsDialog extends StatefulWidget {
     required this.onConfigChanged,
     required this.onStartLogging,
     required this.onStopLogging,
-    required this.onExport,
     required this.onImport,
   });
 
@@ -65,23 +63,20 @@ class _SettingsDialogState extends State<SettingsDialog> {
                   ElevatedButton.icon(
                     icon: const Icon(Icons.stop),
                     label: const Text("停止"),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.red),
                     onPressed: widget.onStopLogging,
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.download),
-                label: const Text("匯出"),
-                onPressed: widget.onExport,
-              ),
               const SizedBox(height: 8),
               ElevatedButton.icon(
                 icon: const Icon(Icons.upload),
                 label: const Text("匯入"),
                 onPressed: () async {
-                  FilePickerResult? result = await FilePicker.platform.pickFiles();
+                  FilePickerResult? result =
+                      await FilePicker.platform.pickFiles();
                   if (result != null && result.files.single.path != null) {
                     File file = File(result.files.single.path!);
                     widget.onImport(file);
@@ -101,7 +96,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
     );
   }
 
-  Widget _buildDoubleField(String label, double initial, void Function(double) onChanged) {
+  Widget _buildDoubleField(
+      String label, double initial, void Function(double) onChanged) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: TextFormField(

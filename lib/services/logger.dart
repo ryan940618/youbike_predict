@@ -32,46 +32,26 @@ class LoggerService {
     await sink.close();
   }
 
-  static Future<List<Map<String, dynamic>>> readLog() async {
-    if (filePath == null) return [];
-
-    final lines = await filePath!.readAsLines();
-    return lines
-        .map((line) => jsonDecode(line) as Map<String, dynamic>)
-        .toList();
-  }
-
   static Future<void> importFromFile() async {
     final file = await openFile(acceptedTypeGroups: [
-      const XTypeGroup(label: 'JSON', extensions: ['json'])
+      const XTypeGroup(label: 'JSON', extensions: ['json']),
     ]);
 
     if (file == null) return;
 
     final content = await file.readAsString();
+
     final data = List<Map<String, dynamic>>.from(jsonDecode(content));
 
     if (filePath == null) return;
 
     final sink = filePath!.openWrite(mode: FileMode.append);
+
     for (var entry in data) {
       sink.writeln(jsonEncode(entry));
     }
+
     await sink.flush();
     await sink.close();
-  }
-
-  static Future<void> exportToFile() async {
-    final data = await readLog();
-
-    final location = await getSaveLocation(
-      suggestedName: 'exported_log.json',
-      acceptedTypeGroups: [const XTypeGroup(label: 'JSON', extensions: ['json'])],
-    );
-
-    if (location == null) return;
-
-    final file = File(location.path);
-    await file.writeAsString(jsonEncode(data));
   }
 }

@@ -54,12 +54,6 @@ class _MapPageState extends State<MapPage> {
         onStopLogging: () {
           samplerService.stopLogging();
         },
-        onExport: () async {
-          await LoggerService.exportToFile();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("已匯出 log_export.json")),
-          );
-        },
         onImport: (File file) async {
           await LoggerService.importFromFile();
           ScaffoldMessenger.of(context).showSnackBar(
