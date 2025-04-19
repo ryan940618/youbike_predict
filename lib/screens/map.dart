@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import '../markers/station_marker.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key, required this.title});
@@ -39,6 +40,7 @@ class _MapPageState extends State<MapPage> {
                   urlTemplate:
                       'https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&s=Ga',
                 ),
+                MarkerWidget(),
               ],
             ),
           ),
