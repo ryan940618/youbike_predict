@@ -13,15 +13,18 @@ Future<List<Station>> fetchStations() async {
   return stations;
 }
 
-Future<Map<String, dynamic>> fetchStationInfo(double lat, double lon) async {
+Future<Map<String, dynamic>> fetchStationInfo(double lat, double lon, [int dist = 1]) async {
+  String latSafe = lat.toStringAsFixed(5); 
+  String lonSafe = lon.toStringAsFixed(5); 
+  print("現在處理 ${latSafe},${lonSafe}");
   final url = Uri.parse("https://apis.youbike.com.tw/tw2/parkingInfo");
   final response = await http.post(
     url,
     headers: {'Content-Type': 'application/json'},
     body: json.encode({
-      'lat': lat,
-      'lng': lon,
-      'maxDistance': 1,
+      'lat': latSafe,
+      'lng': lonSafe,
+      'maxDistance': dist,
     }),
   );
 

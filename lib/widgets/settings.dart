@@ -56,7 +56,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                           "maxLat": maxLat,
                           "minLon": minLon,
                           "maxLon": maxLon,
-                          "interval": interval,
+                          "interval": interval.toInt(),
                         });
                         widget.onStartLogging();
                       }

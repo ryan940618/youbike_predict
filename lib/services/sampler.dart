@@ -12,36 +12,49 @@ class SamplerService {
     required double maxLat,
     required double minLon,
     required double maxLon,
-    required double interval,
+    required int interval,
     required Duration period,
     required void Function(String log) onLog,
   }) {
     if (_isLogging) return;
     _isLogging = true;
 
-    _timer = Timer.periodic(period, (timer) async {
-      final points = generatePoints(minLat, maxLat, minLon, maxLon, interval);
-      final stationSet = <String>{};
-      final results = <Map<String, dynamic>>[];
+    _performLogging(minLat, maxLat, minLon, maxLon, interval, onLog);
 
-      for (final point in points) {
-        try {
-          print("現在處理 ${point.latitude},${point.longitude}");
-          final data = await fetchStationInfo(point.latitude, point.longitude);
-          final list = data['retVal'];
-          for (var item in list) {
-            if (stationSet.add(item['station_no'])) {
-              results.add(item);
-            }
-          }
-        } catch (e) {
-          print("座標 ${point.latitude},${point.longitude} 處取得資料失敗: $e");
-        }
-      }
-
-      await LoggerService.writeLog(results);
-      onLog("Logged 站點數量： ${results.length} @ ${DateTime.now()}");
+    _timer = Timer.periodic(period, (timer) {
+      _performLogging(minLat, maxLat, minLon, maxLon, interval, onLog);
     });
+  }
+
+  void _performLogging(
+    double minLat,
+    double maxLat,
+    double minLon,
+    double maxLon,
+    int interval,
+    void Function(String log) onLog,
+  ) async {
+    final points = generatePoints(minLat, maxLat, minLon, maxLon, interval);
+    final stationSet = <String>{};
+    final results = <Map<String, dynamic>>[];
+
+    for (final point in points) {
+      try {
+        final data =
+            await fetchStationInfo(point.latitude, point.longitude, 10000);
+        final list = data['retVal'];
+        for (var item in list) {
+          if (stationSet.add(item['station_no'])) {
+            results.add(item);
+          }
+        }
+      } catch (e) {
+        print("座標 ${point.latitude},${point.longitude} 處取得資料失敗: $e");
+      }
+    }
+
+    await LoggerService.writeLog(results);
+    onLog("Logged 站點數量： ${results.length} @ ${DateTime.now()}");
   }
 
   void stopLogging() {
@@ -49,7 +62,8 @@ class SamplerService {
     _isLogging = false;
   }
 
-  List<LatLng> generatePoints(double minLat, double maxLat, double minLon, double maxLon, double intervalMeter) {
+  List<LatLng> generatePoints(double minLat, double maxLat, double minLon,
+      double maxLon, int intervalMeter) {
     // 把 interval (meter) 轉成經緯度位移，然後產生網格點
     // 約略換算：1 度緯度 ≈ 111000 公尺
     final delta = intervalMeter / 111000;
