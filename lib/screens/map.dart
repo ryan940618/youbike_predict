@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../widgets/station_marker.dart';
+import '../services/logger.dart';
+import '../services/sampler.dart';
+import '../widgets/settings.dart';
+import 'dart:io';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key, required this.title});
@@ -11,6 +15,61 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  late final SamplerService samplerService;
+  Map<String, dynamic> currentConfig = {};
+
+  @override
+  void initState() {
+    super.initState();
+    samplerService = SamplerService();
+  }
+
+  @override
+  void dispose() {
+    samplerService.stopLogging();
+    super.dispose();
+  }
+
+  void _openSettings() {
+    showDialog(
+      context: context,
+      builder: (context) => SettingsDialog(
+        onConfigChanged: (config) {
+          currentConfig = config;
+        },
+        onStartLogging: () async {
+          final ok = await LoggerService.initLogFile();
+          if (!ok) return;
+      
+          samplerService.startLogging(
+          minLat: currentConfig["minLat"],
+          maxLat: currentConfig["maxLat"],
+          minLon: currentConfig["minLon"],
+          maxLon: currentConfig["maxLon"],
+          interval: currentConfig["interval"],
+          period: const Duration(minutes: 1),
+          onLog: (msg) => print("[Log]$msg"),
+          );
+        },
+        onStopLogging: () {
+          samplerService.stopLogging();
+        },
+        onExport: () async {
+          await LoggerService.exportToFile();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("已匯出 log_export.json")),
+          );
+        },
+        onImport: (File file) async {
+          await LoggerService.importFromFile();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("匯入完成")),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,6 +80,12 @@ class _MapPageState extends State<MapPage> {
           color: Color(0xffa3a3a3),
           fontSize: 18,
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: _openSettings,
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -73,4 +138,3 @@ class _MapPageState extends State<MapPage> {
     );
   }
 }
-

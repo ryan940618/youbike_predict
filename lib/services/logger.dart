@@ -1,41 +1,77 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:file_selector/file_selector.dart';
 
 class LoggerService {
-  static const String _logFilePath = '/log.json';
+  static File? filePath;
+
+  static Future<bool> initLogFile() async {
+    final saveLocation = await getSaveLocation(
+      suggestedName: 'log.json',
+      acceptedTypeGroups: [
+        const XTypeGroup(label: 'JSON', extensions: ['json']),
+      ],
+    );
+
+    if (saveLocation == null) return false;
+
+    filePath = File(saveLocation.path);
+    return true;
+  }
 
   static Future<void> writeLog(List<Map<String, dynamic>> data) async {
-    final file = File(_logFilePath);
-    final sink = file.openWrite(mode: FileMode.append);
+    if (filePath == null) return;
+
+    final sink = filePath!.openWrite(mode: FileMode.append);
 
     for (var entry in data) {
       sink.writeln(jsonEncode(entry));
     }
+
     await sink.flush();
     await sink.close();
   }
 
   static Future<List<Map<String, dynamic>>> readLog() async {
-    final file = File(_logFilePath);
-    final lines = await file.readAsLines();
-    return lines.map((line) => jsonDecode(line) as Map<String, dynamic>).toList();
+    if (filePath == null) return [];
+
+    final lines = await filePath!.readAsLines();
+    return lines
+        .map((line) => jsonDecode(line) as Map<String, dynamic>)
+        .toList();
   }
 
-  static Future<void> exportToFile(String exportPath) async {
-    final data = await readLog();
-    final file = File(exportPath);
-    await file.writeAsString(jsonEncode(data));
-  }
+  static Future<void> importFromFile() async {
+    final file = await openFile(acceptedTypeGroups: [
+      const XTypeGroup(label: 'JSON', extensions: ['json'])
+    ]);
 
-  static Future<void> importFromFile(String importPath) async {
-    final file = File(importPath);
+    if (file == null) return;
+
     final content = await file.readAsString();
     final data = List<Map<String, dynamic>>.from(jsonDecode(content));
-    final sink = File(_logFilePath).openWrite(mode: FileMode.append);
+
+    if (filePath == null) return;
+
+    final sink = filePath!.openWrite(mode: FileMode.append);
     for (var entry in data) {
       sink.writeln(jsonEncode(entry));
     }
     await sink.flush();
     await sink.close();
+  }
+
+  static Future<void> exportToFile() async {
+    final data = await readLog();
+
+    final location = await getSaveLocation(
+      suggestedName: 'exported_log.json',
+      acceptedTypeGroups: [const XTypeGroup(label: 'JSON', extensions: ['json'])],
+    );
+
+    if (location == null) return;
+
+    final file = File(location.path);
+    await file.writeAsString(jsonEncode(data));
   }
 }

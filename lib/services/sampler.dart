@@ -26,6 +26,7 @@ class SamplerService {
 
       for (final point in points) {
         try {
+          print("現在處理 ${point.latitude},${point.longitude}");
           final data = await fetchStationInfo(point.latitude, point.longitude);
           final list = data['retVal'];
           for (var item in list) {
