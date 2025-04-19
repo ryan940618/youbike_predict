@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:file_selector/file_selector.dart';
+import 'analyzer.dart';
 
 class LoggerService {
   static File? filePath;
@@ -33,25 +34,13 @@ class LoggerService {
   }
 
   static Future<void> importFromFile() async {
-    final file = await openFile(acceptedTypeGroups: [
+    final xfile = await openFile(acceptedTypeGroups: [
       const XTypeGroup(label: 'JSON', extensions: ['json']),
     ]);
 
-    if (file == null) return;
+    if (xfile == null) return;
 
-    final content = await file.readAsString();
-
-    final data = List<Map<String, dynamic>>.from(jsonDecode(content));
-
-    if (filePath == null) return;
-
-    final sink = filePath!.openWrite(mode: FileMode.append);
-
-    for (var entry in data) {
-      sink.writeln(jsonEncode(entry));
-    }
-
-    await sink.flush();
-    await sink.close();
+    final file = File(xfile.path);
+    await Analyzer().loadFromFile(file);
   }
 }

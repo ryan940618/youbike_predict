@@ -10,6 +10,7 @@ class StationLog {
 
 class Analyzer {
   final Map<String, List<StationLog>> _logsByStation = {};
+   bool get isDataLoaded => _logsByStation.isNotEmpty;
 
   Future<void> loadFromFile(File file) async {
     _logsByStation.clear();
@@ -44,26 +45,29 @@ class Analyzer {
     return logs;
   }
 
-  List<StationLog> extractRangedLogs(String stationNo, DateTime center, Duration range) {
+  List<StationLog> extractRangedLogs(
+      String stationNo, DateTime center, Duration range) {
     final logs = getLogs(stationNo);
     if (logs == null) return [];
 
     return logs.where((log) {
       return log.timestamp.isAfter(center.subtract(range)) &&
-             log.timestamp.isBefore(center.add(range));
+          log.timestamp.isBefore(center.add(range));
     }).toList();
   }
 
   double calculateAverage(List<StationLog> logs) {
     if (logs.isEmpty) return 0;
-    return logs.map((e) => e.availableSpaces).reduce((a, b) => a + b) / logs.length;
+    return logs.map((e) => e.availableSpaces).reduce((a, b) => a + b) /
+        logs.length;
   }
 
   List<double> calculateChangeRates(List<StationLog> logs, Duration step) {
     final result = <double>[];
 
     for (int i = 1; i < logs.length; i++) {
-      final diffMinutes = logs[i].timestamp.difference(logs[i - 1].timestamp).inMinutes;
+      final diffMinutes =
+          logs[i].timestamp.difference(logs[i - 1].timestamp).inMinutes;
       if (diffMinutes == step.inMinutes) {
         final delta = logs[i].availableSpaces - logs[i - 1].availableSpaces;
         result.add(delta / step.inMinutes);
