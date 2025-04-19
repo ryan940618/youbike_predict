@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import '../services/api.dart';
 import '../models/station.dart';
+import '../widgets/detail.dart';
 
 class MarkerWidget extends StatefulWidget {
   @override
@@ -32,22 +33,41 @@ class _MarkerWidget extends State<MarkerWidget> {
 
           List<Marker> stationMarkers = stations.map((station) {
             return Marker(
-              width: 8,
-              point: LatLng(station.lat, station.lon),
-              child: GestureDetector(
-                child: Tooltip(
-                  message: "站名：${station.name}",
-                  triggerMode: TooltipTriggerMode.tap,
+                width: 8,
+                point: LatLng(station.lat, station.lon),
+                child: GestureDetector(
+                  onTap: () async {
+                    try {
+                      final stationName = station.name;
+                      final infoJson =
+                          await fetchStationInfo(station.lat, station.lon);
+                      final stationData = infoJson['retVal'][0];
+                      final stationNo = stationData['station_no'];
+                      final bikeDetails = await fetchStationDetail(stationNo);
+
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) => StationDetail(
+                          stationData: stationData,
+                          bikeDetails: bikeDetails,
+                          stationName: stationName, 
+                        ),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('資料讀取失敗：$e')),
+                      );
+                    }
+                  },
                   child: Container(
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 255, 0, 0).withOpacity(1),
+                      color:
+                          const Color.fromARGB(255, 255, 0, 0).withOpacity(1),
                       shape: BoxShape.circle,
                     ),
                     padding: const EdgeInsets.all(8),
                   ),
-                ),
-              ),
-            );
+                ));
           }).toList();
 
           return MarkerLayer(markers: stationMarkers);
