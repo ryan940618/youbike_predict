@@ -44,11 +44,11 @@ class _MapPageState extends State<MapPage> {
     });
 
     sampler.startLogging(
-      minLat: 22.565504,
-      maxLat: 22.999788,
-      minLon: 120.272277,
-      maxLon: 120.513318,
-      interval: 18000,
+      minLat: 22.465504,
+      maxLat: 23.099788,
+      minLon: 120.172277,
+      maxLon: 120.613318,
+      interval: 10000,
       period: const Duration(minutes: 1),
       onLog: (msg) => print("[Log]$msg"),
       onStationsUpdated: onStationsUpdated,
