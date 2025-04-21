@@ -22,9 +22,9 @@ class SettingsDialog extends StatefulWidget {
 
 class _SettingsDialogState extends State<SettingsDialog> {
   final _formKey = GlobalKey<FormState>();
-  double minLat = 22.565504, maxLat = 22.999788;
-  double minLon = 120.272277, maxLon = 120.513318;
-  double interval = 18000;
+  double minLat = 22.465504, maxLat = 23.099788;
+  double minLon = 120.172277, maxLon = 120.613318;
+  double interval = 10000;
 
   @override
   Widget build(BuildContext context) {
