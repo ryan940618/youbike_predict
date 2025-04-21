@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import '../widgets/station_marker.dart';
 import '../services/logger.dart';
 import '../services/sampler.dart';
 import '../widgets/settings.dart';
@@ -65,6 +64,7 @@ class _MapPageState extends State<MapPage> {
   List<Marker> markers = [];
 
   void updateMarkers() {
+    int count = 0;
     markers = stations
         .map((station) {
           Map<String, dynamic>? staticData = stationStaticInfo.firstWhere(
@@ -73,6 +73,7 @@ class _MapPageState extends State<MapPage> {
           );
 
           if (staticData.isEmpty) return null;
+          count++;
           final lat = staticData['lat'];
           final lon = staticData['lon'];
           final name = staticData['name'];
@@ -114,6 +115,7 @@ class _MapPageState extends State<MapPage> {
         })
         .whereType<Marker>()
         .toList();
+        print("共更新站點 ${count} 站");
   }
 
   Color getColorByAvailability(int availableSpaces) {

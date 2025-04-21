@@ -10,13 +10,14 @@ Future<List<Station>> fetchStations() async {
   for (var item in data['data']['data']['retVal']) {
     stations.add(Station.listJson(item));
   }
+  print("初始化站點 共${stations.length}站");
   return stations;
 }
 
 Future<Map<String, dynamic>> fetchStationInfo(double lat, double lon, [int dist = 1]) async {
   String latSafe = lat.toStringAsFixed(5); 
   String lonSafe = lon.toStringAsFixed(5); 
-  print("現在處理 ${latSafe},${lonSafe}");
+  print("取得資料：${latSafe}, ${lonSafe}, ${dist}");
   final url = Uri.parse("https://apis.youbike.com.tw/tw2/parkingInfo");
   final response = await http.post(
     url,
