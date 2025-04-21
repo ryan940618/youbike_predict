@@ -12,7 +12,6 @@ import 'dart:io';
 class MapPage extends StatefulWidget {
   MapPage({super.key, required this.title});
   final String title;
-
   static List<Map<String, dynamic>> stationStaticInfo = [];
   static void addStationData(Map<String, dynamic> stationData) {
     stationStaticInfo.add(stationData);
@@ -23,6 +22,7 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  String timestamp = "正在載入...";
   List<Map<String, dynamic>> get stationStaticInfo => MapPage.stationStaticInfo;
   late final Sampler sampler;
   Map<String, dynamic> currentConfig = {};
@@ -126,6 +126,7 @@ class _MapPageState extends State<MapPage> {
     setState(() {
       stations = newStations;
       updateMarkers();
+      timestamp = DateTime.now().toString();
     });
   }
 
@@ -203,7 +204,7 @@ class _MapPageState extends State<MapPage> {
               ],
             ),
           ),
-          const Positioned(
+          Positioned(
             left: 10,
             bottom: 10,
             child: Column(
@@ -218,7 +219,7 @@ class _MapPageState extends State<MapPage> {
                   ),
                 ),
                 Text(
-                  "timestamp",
+                  timestamp,
                   style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 14,
