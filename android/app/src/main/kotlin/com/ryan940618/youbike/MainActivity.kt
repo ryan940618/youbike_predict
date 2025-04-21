@@ -1,4 +1,4 @@
-package com.example.youbike_predict
+package com.ryan940618.youbike
 
 import io.flutter.embedding.android.FlutterActivity
 
