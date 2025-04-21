@@ -47,7 +47,7 @@ class _MapPageState extends State<MapPage> {
       maxLat: 23.099788,
       minLon: 120.172277,
       maxLon: 120.613318,
-      interval: 10000,
+      interval: 16000,
       period: const Duration(minutes: 1),
       onLog: (msg) => print("[Log]$msg"),
       onStationsUpdated: onStationsUpdated,
@@ -79,7 +79,7 @@ class _MapPageState extends State<MapPage> {
           final name = staticData['name'];
           final color = getColorByAvailability(station['available_spaces']);
           return Marker(
-              width: 8,
+              width: 10,
               point: LatLng(lat, lon),
               child: GestureDetector(
                 onTap: () async {
