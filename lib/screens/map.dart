@@ -15,18 +15,18 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  late final SamplerService samplerService;
+  late final Sampler sampler;
   Map<String, dynamic> currentConfig = {};
 
   @override
   void initState() {
     super.initState();
-    samplerService = SamplerService();
+    sampler = Sampler();
   }
 
   @override
   void dispose() {
-    samplerService.stopLogging();
+    sampler.stopLogging();
     super.dispose();
   }
 
@@ -41,7 +41,7 @@ class _MapPageState extends State<MapPage> {
           final ok = await LoggerService.initLogFile();
           if (!ok) return;
       
-          samplerService.startLogging(
+          sampler.startLogging(
           minLat: currentConfig["minLat"],
           maxLat: currentConfig["maxLat"],
           minLon: currentConfig["minLon"],
@@ -52,7 +52,7 @@ class _MapPageState extends State<MapPage> {
           );
         },
         onStopLogging: () {
-          samplerService.stopLogging();
+          sampler.stopLogging();
         },
         onImport: (File file) async {
           await LoggerService.importFromFile();

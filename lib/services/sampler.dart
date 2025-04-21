@@ -3,7 +3,7 @@ import 'package:latlong2/latlong.dart';
 import '../services/api.dart';
 import '../services/logger.dart';
 
-class SamplerService {
+class Sampler {
   Timer? _timer;
   bool _isLogging = false;
 
@@ -59,7 +59,7 @@ class SamplerService {
     };
 
     await LoggerService.writeLog([logEntry]);
-    onLog("Logged 站點數量： ${results.length} @ ${DateTime.now()}");
+    onLog("Logged 站點數量：${results.length} @ ${DateTime.now()}");
   }
 
   void stopLogging() {
