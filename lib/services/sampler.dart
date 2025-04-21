@@ -15,14 +15,19 @@ class Sampler {
     required int interval,
     required Duration period,
     required void Function(String log) onLog,
+    required void Function(List<Map<String, dynamic>>) onStationsUpdated,
   }) {
-    if (_isLogging) return;
+    if (_isLogging) {
+      _timer!.cancel();
+    }
     _isLogging = true;
 
-    _performLogging(minLat, maxLat, minLon, maxLon, interval, onLog);
+    _performLogging(
+        minLat, maxLat, minLon, maxLon, interval, onLog, onStationsUpdated);
 
     _timer = Timer.periodic(period, (timer) {
-      _performLogging(minLat, maxLat, minLon, maxLon, interval, onLog);
+      _performLogging(
+          minLat, maxLat, minLon, maxLon, interval, onLog, onStationsUpdated);
     });
   }
 
@@ -33,6 +38,7 @@ class Sampler {
     double maxLon,
     int interval,
     void Function(String log) onLog,
+    void Function(List<Map<String, dynamic>>) onStationsUpdated,
   ) async {
     final points = generatePoints(minLat, maxLat, minLon, maxLon, interval);
     final stationSet = <String>{};
@@ -57,13 +63,15 @@ class Sampler {
       'timestamp': DateTime.now().toIso8601String(),
       'stations': results,
     };
+    onStationsUpdated(results);
 
-    await LoggerService.writeLog([logEntry]);
+    if (_isLogging) {
+      await LoggerService.writeLog([logEntry]);
+    }
     onLog("Logged 站點數量：${results.length} @ ${DateTime.now()}");
   }
 
   void stopLogging() {
-    _timer?.cancel();
     _isLogging = false;
   }
 

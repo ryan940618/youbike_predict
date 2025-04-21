@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'YouBike 即時資料及預測',
       debugShowCheckedModeBanner: false,
       home: MapPage(title: 'YouBike 即時資料及預測'),

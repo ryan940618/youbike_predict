@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 import '../services/api.dart';
 import '../models/station.dart';
 import '../widgets/detail.dart';
+import '../screens/map.dart';
 
 class MarkerWidget extends StatefulWidget {
   @override
@@ -16,7 +17,17 @@ class _MarkerWidget extends State<MarkerWidget> {
   @override
   void initState() {
     super.initState();
-    stationsFuture = fetchStations();
+    stationsFuture = fetchStations().then((stations) {
+      for (var station in stations) {
+        MapPage.addStationData({
+          'station_no': station.id,
+          'name': station.name,
+          'lat': station.lat,
+          'lon': station.lon,
+        });
+      }
+      return stations;
+    });
   }
 
   @override
@@ -50,7 +61,7 @@ class _MarkerWidget extends State<MarkerWidget> {
                         builder: (context) => StationDetail(
                           stationData: stationData,
                           bikeDetails: bikeDetails,
-                          stationName: stationName, 
+                          stationName: stationName,
                         ),
                       );
                     } catch (e) {
