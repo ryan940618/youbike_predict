@@ -62,10 +62,10 @@ class StationDetail extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("未來可能有車時段："),
-              ...likelyTimes.map((t) => Text("• $t")),
+              //const Text("未來可能有車時段："),
+              //...likelyTimes.map((t) => Text("• $t")),
               const SizedBox(height: 12),
-              const Text("附近站點："),
+              const Text("附近有車站點："),
               ...nearbyStations.map((s) => Text("• $s")),
             ],
           ),
