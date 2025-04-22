@@ -33,6 +33,8 @@ class HourlyHistogram extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    Text(value.toStringAsFixed(1),
+                          style: const TextStyle(fontSize: 10)),
                     Container(
                       width: 20,
                       height: value,
