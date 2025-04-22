@@ -171,7 +171,7 @@ class Analyzer {
     );
 
     return results.map((s) {
-      final name = s['name'] ?? '無站名';
+      final name = (s['name'] ?? '無站名').replaceAll('YouBike2.0_', '');
       final distance = s['distance']?.toStringAsFixed(0) ?? '?';
       final available = s['available_spaces'] ?? 0;
       final total = s['parking_spaces'] ?? 0;

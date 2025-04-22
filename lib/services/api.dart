@@ -9,11 +9,6 @@ Future<List<Station>> fetchStations() async {
   List<Station> stations = [];
 
   for (var item in data['data']['data']['retVal'].values) {
-    item['stationName'] = (item['stationName'] ?? '')
-        .toString()
-        .replaceAll('YouBike2.0_', '')
-        .trim();
-
     stations.add(Station.listJson(item));
   }
   print("初始化站點 共${stations.length}站");
