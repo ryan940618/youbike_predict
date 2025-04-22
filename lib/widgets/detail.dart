@@ -31,13 +31,13 @@ class StationDetail extends StatelessWidget {
           const SizedBox(height: 12),
           HourlyHistogram(
             data: Analyzer.getHourlyAvg(stationData['station_no']),
-            title: "平均可借車數",
+            title: "每小時平均可借車數",
             color: Colors.green,
           ),
           const SizedBox(height: 12),
           HourlyHistogram(
             data: Analyzer.getHourlyAvgDelta(stationData['station_no']),
-            title: "平均變化量",
+            title: "每小時平均變化量",
             color: Colors.orange,
           ),
           const Divider(),
