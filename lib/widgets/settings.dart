@@ -6,7 +6,7 @@ class SettingsDialog extends StatefulWidget {
   final void Function(Map<String, dynamic>) onConfigChanged;
   final VoidCallback onStartLogging;
   final VoidCallback onStopLogging;
-  final void Function(File importFile) onImport;
+  final void Function() onImport;
 
   const SettingsDialog({
     super.key,
@@ -75,12 +75,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 icon: const Icon(Icons.upload),
                 label: const Text("匯入"),
                 onPressed: () async {
-                  FilePickerResult? result =
-                      await FilePicker.platform.pickFiles();
-                  if (result != null && result.files.single.path != null) {
-                    File file = File(result.files.single.path!);
-                    widget.onImport(file);
-                  }
+                  widget.onImport();
                 },
               ),
             ],

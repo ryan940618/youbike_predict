@@ -164,7 +164,7 @@ class _MapPageState extends State<MapPage> {
         onStopLogging: () {
           sampler.stopLogging();
         },
-        onImport: (File file) async {
+        onImport: () async {
           await LoggerService.importFromFile();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("匯入完成")),
