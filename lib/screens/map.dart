@@ -103,6 +103,10 @@ class _MapPageState extends State<MapPage> {
                         stationData: stationData,
                         bikeDetails: bikeDetails,
                         stationName: stationName,
+                        stations: stations,
+                        lat: lat,
+                        lon: lon,
+                        stationStaticInfo: stationStaticInfo,
                       ),
                     );
                   } catch (e) {

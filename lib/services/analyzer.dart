@@ -63,7 +63,6 @@ class Analyzer {
     final logs = _importedData[stationNo];
     if (logs == null || logs.length < 2) return {};
 
-    // 時間排序
     logs.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
     final Map<int, List<int>> hourlyChanges = {};
@@ -72,7 +71,6 @@ class Analyzer {
       final prev = logs[i - 1];
       final curr = logs[i];
 
-      // 必須是同一小時才算變化值
       if (curr.timestamp.hour != prev.timestamp.hour) continue;
 
       final hour = curr.timestamp.hour;
@@ -86,17 +84,23 @@ class Analyzer {
     });
   }
 
-  static int? predictFutureLikely(String stationNo) {
+  static List<String> predictFutureLikely(String stationNo,
+      {int maxItems = 5}) {
     final hourlyAvg = getHourlyAvg(stationNo);
     final sorted = hourlyAvg.entries.where((e) => e.value > 0).toList()
-      ..sort((a, b) => a.key.compareTo(b.key));
-    return sorted.isNotEmpty ? sorted.first.key : null;
+      ..sort((a, b) => a.value.compareTo(b.value));
+
+    return sorted.take(maxItems).map((entry) {
+      final hour = entry.key;
+      return "${hour.toString().padLeft(2, '0')}時15分";
+    }).toList();
   }
 
   static List<Map<String, dynamic>> findNearby({
     required double lat,
     required double lon,
     required List<Map<String, dynamic>> realTimeStations,
+    required List<Map<String, dynamic>> staticStationData,
     double maxDistanceMeters = 400,
     int maxResults = 5,
   }) {
@@ -104,7 +108,7 @@ class Analyzer {
       const r = 6371000;
       final dLat = (lat2 - lat1) * 3.1415926 / 180;
       final dLon = (lon2 - lon1) * 3.1415926 / 180;
-      final a = (sin(dLat / 2) * sin(dLat / 2)) +
+      final a = sin(dLat / 2) * sin(dLat / 2) +
           cos(lat1 * 3.1415926 / 180) *
               cos(lat2 * 3.1415926 / 180) *
               sin(dLon / 2) *
@@ -113,17 +117,67 @@ class Analyzer {
       return r * c;
     }
 
-    return realTimeStations
+    final result = realTimeStations
         .where((s) => s['available_spaces'] > 0)
-        .map((s) => {
-              'station_no': s['station_no'],
-              'name': s['name'],
-              'available_spaces': s['available_spaces'],
-              'distance': distance(lat, lon, s['lat'], s['lon']),
-            })
-        .where((s) => s['distance'] < maxDistanceMeters)
-        .toList()
-      ..sort((a, b) => a['distance'].compareTo(b['distance']))
-      ..take(maxResults);
+        .map((s) {
+          final staticInfo = staticStationData.firstWhere(
+            (e) => e['station_no'] == s['station_no'],
+            orElse: () => {},
+          );
+
+          if (staticInfo.isEmpty ||
+              staticInfo['lat'] == null ||
+              staticInfo['lon'] == null) {
+            return <String, dynamic>{};
+          }
+
+          final stationLat = staticInfo['lat'];
+          final stationLon = staticInfo['lon'];
+
+          return {
+            'station_no': s['station_no'],
+            'name': staticInfo['name'],
+            'available_spaces': s['available_spaces'],
+            'yb2': s['available_spaces_detail']?['yb2'] ?? 0,
+            'eyb': s['available_spaces_detail']?['eyb'] ?? 0,
+            'distance': distance(lat, lon, stationLat, stationLon).round(),
+          };
+        })
+        .whereType<Map<String, dynamic>>()
+        .where((s) => s['distance'] != null && s['distance'] > 0)
+        .toList();
+
+    result.removeWhere((s) => s.isEmpty);
+
+    result.sort((a, b) => a['distance'].compareTo(b['distance']));
+    result.length = min(maxResults, result.length);
+
+    return result;
+  }
+
+  static List<String> formattedFindNearby({
+    required double lat,
+    required double lon,
+    required List<Map<String, dynamic>> realTimeStations,
+    required List<Map<String, dynamic>> stationStaticInfo,
+    int maxResults = 5,
+  }) {
+    final results = findNearby(
+      lat: lat,
+      lon: lon,
+      realTimeStations: realTimeStations,
+      maxResults: maxResults,
+      staticStationData: stationStaticInfo,
+    );
+
+    return results.map((s) {
+      final name = (s['name'] ?? '無站名').replaceAll('YouBike2.0_', '');
+      final distance = s['distance']?.toStringAsFixed(0) ?? '?';
+      final available = s['available_spaces'] ?? 0;
+      final yb2 = s['yb2'] ?? 0;
+      final eyb = s['eyb'] ?? 0;
+
+      return "$name($distance)m\n空位:$available (YouBike 2.0:$yb2 電輔車:$eyb)";
+    }).toList();
   }
 }
