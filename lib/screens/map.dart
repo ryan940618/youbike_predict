@@ -86,7 +86,7 @@ class _MapPageState extends State<MapPage> {
           final name = staticData['name'];
           final color = getColorByAvailability(station['available_spaces']);
           return Marker(
-              width: 10,
+              width: 15,
               point: LatLng(lat, lon),
               child: GestureDetector(
                 onTap: () async {
