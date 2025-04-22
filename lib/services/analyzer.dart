@@ -141,6 +141,7 @@ class Analyzer {
             'yb2': s['available_spaces_detail']?['yb2'] ?? 0,
             'eyb': s['available_spaces_detail']?['eyb'] ?? 0,
             'distance': distance(lat, lon, stationLat, stationLon).round(),
+            'parking_spaces': s['parking_spaces'],
           };
         })
         .whereType<Map<String, dynamic>>()
