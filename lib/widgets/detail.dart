@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../services/analyzer.dart';
+import 'histogram.dart';
 
 class StationDetail extends StatelessWidget {
   final Map<String, dynamic> stationData;
@@ -23,9 +25,21 @@ class StationDetail extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.bold)),
           Text("編號: ${stationData['station_no']}"),
           Text("停車格總數: ${stationData['parking_spaces']}"),
-          Text("可借車數: ${stationData['available_spaces']}（YouBike 2.0: ${stationData['available_spaces_detail']['yb2']}, YouBike 2.0E電輔車: ${stationData['available_spaces_detail']['eyb']}）"),
+          Text(
+              "可借車數: ${stationData['available_spaces']}（YouBike 2.0: ${stationData['available_spaces_detail']['yb2']}, YouBike 2.0E電輔車: ${stationData['available_spaces_detail']['eyb']}）"),
           Text("空位數: ${stationData['empty_spaces']}"),
           const SizedBox(height: 12),
+          HourlyHistogram(
+            data: Analyzer.getHourlyAvg(stationData['station_no']),
+            title: "平均可借車數",
+            color: Colors.green,
+          ),
+          const SizedBox(height: 12),
+          HourlyHistogram(
+            data: Analyzer.getHourlyAvgDelta(stationData['station_no']),
+            title: "平均變化量",
+            color: Colors.orange,
+          ),
           const Divider(),
           bikeDetails.isNotEmpty
               ? Column(

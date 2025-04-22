@@ -10,7 +10,7 @@ class StationLog {
 }
 
 class Analyzer {
-  final Map<String, List<StationLog>> _importedData = {};
+  static Map<String, List<StationLog>> _importedData = {};
   bool get isDataLoaded => _importedData.isNotEmpty;
 
   Future<void> loadFromFile(File file) async {
@@ -40,9 +40,8 @@ class Analyzer {
 
   static Map<int, double> getHourlyAvg(
     String stationNo,
-    Map<String, List<StationLog>> importedData,
   ) {
-    final logs = importedData[stationNo];
+    final logs = _importedData[stationNo];
     if (logs == null || logs.isEmpty) return {};
 
     final Map<int, List<int>> hourlyValues = {};
@@ -60,9 +59,8 @@ class Analyzer {
 
   static Map<int, double> getHourlyAvgDelta(
     String stationNo,
-    Map<String, List<StationLog>> importedData,
   ) {
-    final logs = importedData[stationNo];
+    final logs = _importedData[stationNo];
     if (logs == null || logs.length < 2) return {};
 
     // 時間排序
@@ -88,9 +86,8 @@ class Analyzer {
     });
   }
 
-  static int? predictFutureLikely(
-      String stationNo, Map<String, List<StationLog>> importedData) {
-    final hourlyAvg = getHourlyAvg(stationNo, importedData);
+  static int? predictFutureLikely(String stationNo) {
+    final hourlyAvg = getHourlyAvg(stationNo);
     final sorted = hourlyAvg.entries.where((e) => e.value > 0).toList()
       ..sort((a, b) => a.key.compareTo(b.key));
     return sorted.isNotEmpty ? sorted.first.key : null;
