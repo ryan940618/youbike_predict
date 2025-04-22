@@ -174,10 +174,11 @@ class Analyzer {
       final name = (s['name'] ?? '無站名').replaceAll('YouBike2.0_', '');
       final distance = s['distance']?.toStringAsFixed(0) ?? '?';
       final available = s['available_spaces'] ?? 0;
+      final total = s['parking_spaces'] ?? 0;
       final yb2 = s['yb2'] ?? 0;
       final eyb = s['eyb'] ?? 0;
 
-      return "$name($distance)m\n空位:$available (YouBike 2.0:$yb2 電輔車:$eyb)";
+      return "$name(${distance}m)\n車輛數:$available/$total (YouBike 2.0:$yb2 電輔車:$eyb)";
     }).toList();
   }
 }
