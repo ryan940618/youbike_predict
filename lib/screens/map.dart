@@ -7,6 +7,7 @@ import '../widgets/settings.dart';
 import '../services/api.dart';
 import '../widgets/detail.dart';
 import 'dart:io';
+import '../widgets/search.dart';
 
 class MapPage extends StatefulWidget {
   MapPage({super.key, required this.title});
@@ -21,6 +22,7 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  late final MapController mapController;
   String timestamp = "正在載入...";
   List<Map<String, dynamic>> get stationStaticInfo => MapPage.stationStaticInfo;
   late final Sampler sampler;
@@ -28,6 +30,7 @@ class _MapPageState extends State<MapPage> {
 
   @override
   void initState() {
+    mapController = MapController();
     super.initState();
     sampler = Sampler();
     fetchStations().then((stations) {
@@ -52,6 +55,10 @@ class _MapPageState extends State<MapPage> {
       onLog: (msg) => print("[Log]$msg"),
       onStationsUpdated: onStationsUpdated,
     );
+  }
+
+  void focusMap(double lat, double lng) {
+    mapController.move(LatLng(lat, lng), 20.0);
   }
 
   @override
@@ -115,7 +122,7 @@ class _MapPageState extends State<MapPage> {
         })
         .whereType<Marker>()
         .toList();
-        print("共更新站點 ${count} 站");
+    print("共更新站點 ${count} 站");
   }
 
   Color getColorByAvailability(int availableSpaces) {
@@ -190,6 +197,7 @@ class _MapPageState extends State<MapPage> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             child: FlutterMap(
+              mapController: mapController,
               options: const MapOptions(
                 initialCenter: LatLng(23.761, 120.958),
                 initialZoom: 7.5,
@@ -204,6 +212,15 @@ class _MapPageState extends State<MapPage> {
                 ),
                 MarkerLayer(markers: markers),
               ],
+            ),
+          ),
+          Positioned(
+            top: 16,
+            left: 16,
+            right: 16,
+            child: SearchBarWidget(
+              stationList: stationStaticInfo,
+              onStationSelected: (lat, lng) => focusMap(lat, lng),
             ),
           ),
           Positioned(
