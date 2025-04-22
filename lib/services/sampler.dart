@@ -60,7 +60,7 @@ class Sampler {
     }
 
     final logEntry = {
-      'timestamp': DateTime.now(),
+      'timestamp': DateTime.now().toIso8601String(),
       'stations': results,
     };
     onStationsUpdated(results);
