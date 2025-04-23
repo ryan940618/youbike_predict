@@ -226,28 +226,34 @@ class _MapPageState extends State<MapPage> {
               onStationSelected: (lat, lng) => focusMap(lat, lng),
             ),
           ),
-          Positioned(
-            left: 10,
-            bottom: 10,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  '更新時間：',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              width: double.infinity,
+              height: kToolbarHeight,
+              color: const Color(0xFF292929),
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '更新時間：',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Text(
-                  timestamp,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
+                  Text(
+                    timestamp,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
