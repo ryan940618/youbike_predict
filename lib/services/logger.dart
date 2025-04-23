@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:file_selector/file_selector.dart';
+import 'package:file_picker/file_picker.dart';
 import 'analyzer.dart';
 
 class LoggerService {
@@ -34,16 +35,21 @@ class LoggerService {
   }
 
   static Future<void> importFromFile() async {
-    final xfile = await openFiles(acceptedTypeGroups: [
-      const XTypeGroup(label: 'JSON', extensions: ['json']),
-    ]);
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+    );
 
-    final filesToImport = <File>[];
-    if (xfile.isEmpty) return;
+    if (result != null) {
+      final files = result.paths
+          .where((path) => path != null && path.endsWith('.json'))
+          .map((path) => File(path!))
+          .toList();
 
-    filesToImport.addAll(xfile.map((f) => File(f.path)));
-    for (final file in filesToImport) {
-      await Analyzer().loadFromFile(file);
+      for (final file in files) {
+        await Analyzer().loadFromFile(file);
+      }
+    } else {
+      return;
     }
   }
 }

@@ -4,7 +4,7 @@ import '../services/api.dart';
 import '../services/logger.dart';
 
 class Sampler {
-  Timer? _timer;
+  static Timer? _timer;
   bool _isLogging = false;
 
   void startLogging({
