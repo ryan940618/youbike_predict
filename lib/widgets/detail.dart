@@ -78,7 +78,7 @@ class StationDetail extends StatelessWidget {
           const SizedBox(height: 12),
           HourlyHistogram(
             data: Analyzer.getHourlyAvgDelta(stationData['station_no']),
-            title: "每小時平均變化量",
+            title: "每小時車輛流動率",
             color: Colors.orange,
           ),
         ],
