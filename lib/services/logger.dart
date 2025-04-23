@@ -34,13 +34,16 @@ class LoggerService {
   }
 
   static Future<void> importFromFile() async {
-    final xfile = await openFile(acceptedTypeGroups: [
+    final xfile = await openFiles(acceptedTypeGroups: [
       const XTypeGroup(label: 'JSON', extensions: ['json']),
     ]);
 
-    if (xfile == null) return;
+    final filesToImport = <File>[];
+    if (xfile.isEmpty) return;
 
-    final file = File(xfile.path);
-    await Analyzer().loadFromFile(file);
+    filesToImport.addAll(xfile.map((f) => File(f.path)));
+    for (final file in filesToImport) {
+      await Analyzer().loadFromFile(file);
+    }
   }
 }

@@ -14,7 +14,6 @@ class Analyzer {
   bool get isDataLoaded => _importedData.isNotEmpty;
 
   Future<void> loadFromFile(File file) async {
-    _importedData.clear();
     final lines = await file.readAsLines();
 
     for (var line in lines) {
