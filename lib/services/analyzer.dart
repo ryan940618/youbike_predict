@@ -56,31 +56,32 @@ class Analyzer {
     });
   }
 
-  static Map<int, double> getHourlyAvgDelta(
-    String stationNo,
-  ) {
+  static Map<int, double> getHourlyAvgDelta(String stationNo) {
     final logs = _importedData[stationNo];
     if (logs == null || logs.length < 2) return {};
 
     logs.sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
-    final Map<int, List<int>> hourlyChanges = {};
+    final Map<int, double> hourlyFlow = {};
 
     for (int i = 1; i < logs.length; i++) {
       final prev = logs[i - 1];
       final curr = logs[i];
 
-      if (curr.timestamp.hour != prev.timestamp.hour) continue;
+      final sameHour = prev.timestamp.hour == curr.timestamp.hour &&
+          prev.timestamp.day == curr.timestamp.day &&
+          prev.timestamp.month == curr.timestamp.month &&
+          prev.timestamp.year == curr.timestamp.year;
+
+      if (!sameHour) continue;
 
       final hour = curr.timestamp.hour;
       final diff = (curr.availableSpaces - prev.availableSpaces).abs();
-      hourlyChanges.putIfAbsent(hour, () => []).add(diff);
+
+      hourlyFlow[hour] = (hourlyFlow[hour] ?? 0) + diff;
     }
 
-    return hourlyChanges.map((hour, values) {
-      final avg = values.reduce((a, b) => a + b) / values.length;
-      return MapEntry(hour, avg);
-    });
+    return hourlyFlow;
   }
 
   static List<String> predictFutureLikely(String stationNo,
