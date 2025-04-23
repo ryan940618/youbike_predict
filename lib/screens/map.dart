@@ -6,11 +6,10 @@ import '../services/sampler.dart';
 import '../widgets/settings.dart';
 import '../services/api.dart';
 import '../widgets/detail.dart';
-import 'dart:io';
 import '../widgets/search.dart';
 
 class MapPage extends StatefulWidget {
-  MapPage({super.key, required this.title});
+  const MapPage({super.key, required this.title});
   final String title;
   static List<Map<String, dynamic>> stationStaticInfo = [];
   static void addStationData(Map<String, dynamic> stationData) {
