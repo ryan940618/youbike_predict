@@ -45,12 +45,6 @@ class _MapPageState extends State<MapPage> {
     });
 
     sampler.startLogging(
-      minLat: 22.465504,
-      maxLat: 23.099788,
-      minLon: 120.172277,
-      maxLon: 120.613318,
-      interval: 16000,
-      period: const Duration(minutes: 1),
       onLog: (msg) => print("[Log]$msg"),
       onStationsUpdated: onStationsUpdated,
     );
@@ -146,20 +140,12 @@ class _MapPageState extends State<MapPage> {
     showDialog(
       context: context,
       builder: (context) => SettingsDialog(
-        onConfigChanged: (config) {
-          currentConfig = config;
-        },
+        sampler: sampler,
         onStartLogging: () async {
           final ok = await LoggerService.initLogFile();
           if (!ok) return;
 
           sampler.startLogging(
-            minLat: currentConfig["minLat"],
-            maxLat: currentConfig["maxLat"],
-            minLon: currentConfig["minLon"],
-            maxLon: currentConfig["maxLon"],
-            interval: currentConfig["interval"],
-            period: const Duration(minutes: 1),
             onLog: (msg) => print("[Log]$msg"),
             onStationsUpdated: onStationsUpdated,
           );

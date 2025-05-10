@@ -7,13 +7,34 @@ class Sampler {
   static Timer? _timer;
   bool _isLogging = false;
 
+  double _minLat = 22.465504, _maxLat = 23.099788;
+  double _minLon = 120.172277, _maxLon = 120.613318;
+  int _interval = 16000;
+  Duration period = const Duration(minutes: 1);
+
+  bool getLoggingStat(){
+    return _isLogging;
+  }
+
+  Map<String, dynamic> getConfig() {
+    return {
+      "minLat": _minLat,
+      "maxLat": _maxLat,
+      "minLon": _minLon,
+      "maxLon": _maxLon,
+      "interval": _interval,
+    };
+  }
+
+  void setConfig(Map<String, dynamic> config) {
+    _minLat = config["minLat"];
+    _maxLat = config["maxLat"];
+    _minLon = config["minLon"];
+    _maxLon = config["maxLon"];
+    _interval = config["interval"];
+  }
+
   void startLogging({
-    required double minLat,
-    required double maxLat,
-    required double minLon,
-    required double maxLon,
-    required int interval,
-    required Duration period,
     required void Function(String log) onLog,
     required void Function(List<Map<String, dynamic>>) onStationsUpdated,
   }) {
@@ -22,12 +43,12 @@ class Sampler {
     }
     _isLogging = true;
 
-    _performLogging(
-        minLat, maxLat, minLon, maxLon, interval, onLog, onStationsUpdated);
+    _performLogging(_minLat, _maxLat, _minLon, _maxLon, _interval, onLog,
+        onStationsUpdated);
 
     _timer = Timer.periodic(period, (timer) {
-      _performLogging(
-          minLat, maxLat, minLon, maxLon, interval, onLog, onStationsUpdated);
+      _performLogging(_minLat, _maxLat, _minLon, _maxLon, _interval, onLog,
+          onStationsUpdated);
     });
   }
 

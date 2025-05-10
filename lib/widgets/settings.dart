@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
+import 'package:youbike_predict/services/sampler.dart';
 
 class SettingsDialog extends StatefulWidget {
-  final void Function(Map<String, dynamic>) onConfigChanged;
+  final Sampler sampler;
   final VoidCallback onStartLogging;
   final VoidCallback onStopLogging;
   final void Function() onImport;
 
   const SettingsDialog({
     super.key,
-    required this.onConfigChanged,
+    required this.sampler,
     required this.onStartLogging,
     required this.onStopLogging,
     required this.onImport,
@@ -22,9 +23,45 @@ class SettingsDialog extends StatefulWidget {
 
 class _SettingsDialogState extends State<SettingsDialog> {
   final _formKey = GlobalKey<FormState>();
-  double minLat = 22.465504, maxLat = 23.099788;
-  double minLon = 120.172277, maxLon = 120.613318;
-  double interval = 16000;
+
+  final _minLatController = TextEditingController();
+  final _maxLatController = TextEditingController();
+  final _minLonController = TextEditingController();
+  final _maxLonController = TextEditingController();
+  final _intervalController = TextEditingController();
+
+  late double minLat, maxLat, minLon, maxLon, interval;
+  bool isLogging = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final config = widget.sampler.getConfig();
+    minLat = config['minLat'];
+    maxLat = config['maxLat'];
+    minLon = config['minLon'];
+    maxLon = config['maxLon'];
+    interval = config['interval'].toDouble();
+
+    _minLatController.text = minLat.toString();
+    _maxLatController.text = maxLat.toString();
+    _minLonController.text = minLon.toString();
+    _maxLonController.text = maxLon.toString();
+    _intervalController.text = interval.toString();
+
+    isLogging = widget.sampler.getLoggingStat();
+  }
+
+  void _applyNewConfig() {
+    widget.sampler.setConfig({
+      "minLat": double.parse(_minLatController.text),
+      "maxLat": double.parse(_maxLatController.text),
+      "minLon": double.parse(_minLonController.text),
+      "maxLon": double.parse(_maxLonController.text),
+      "interval": double.parse(_intervalController.text),
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,37 +72,35 @@ class _SettingsDialogState extends State<SettingsDialog> {
           key: _formKey,
           child: Column(
             children: [
-              _buildDoubleField("Min Latitude", minLat, (v) => minLat = v),
-              _buildDoubleField("Max Latitude", maxLat, (v) => maxLat = v),
-              _buildDoubleField("Min Longitude", minLon, (v) => minLon = v),
-              _buildDoubleField("Max Longitude", maxLon, (v) => maxLon = v),
-              _buildDoubleField("間距密度(m)", interval, (v) => interval = v),
+              _buildDoubleField("Min Latitude", _minLatController),
+              _buildDoubleField("Max Latitude", _maxLatController),
+              _buildDoubleField("Min Longitude", _minLonController),
+              _buildDoubleField("Max Longitude", _maxLonController),
+              _buildDoubleField("間距密度(m)", _intervalController),
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   ElevatedButton.icon(
+                    icon: const Icon(Icons.mark_chat_read_rounded),
+                    label: const Text("套用設定"),
+                    onPressed: _applyNewConfig,
+                  ),
+                  ElevatedButton.icon(
                     icon: const Icon(Icons.play_arrow),
-                    label: const Text("開始"),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        widget.onConfigChanged({
-                          "minLat": minLat,
-                          "maxLat": maxLat,
-                          "minLon": minLon,
-                          "maxLon": maxLon,
-                          "interval": interval.toInt(),
-                        });
-                        widget.onStartLogging();
-                      }
-                    },
+                    label: const Text("啟用"),
+                    onPressed: !isLogging
+                        ? () {
+                            widget.onStartLogging();
+                          }
+                        : null,
                   ),
                   ElevatedButton.icon(
                     icon: const Icon(Icons.stop),
-                    label: const Text("停止"),
+                    label: const Text("停用"),
                     style:
                         ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                    onPressed: widget.onStopLogging,
+                    onPressed: isLogging ? widget.onStopLogging : null,
                   ),
                 ],
               ),
@@ -91,22 +126,17 @@ class _SettingsDialogState extends State<SettingsDialog> {
     );
   }
 
-  Widget _buildDoubleField(
-      String label, double initial, void Function(double) onChanged) {
+  Widget _buildDoubleField(String label, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: TextFormField(
-        initialValue: initial.toString(),
+        controller: controller,
         decoration: InputDecoration(labelText: label),
         keyboardType: TextInputType.number,
         validator: (value) {
           final v = double.tryParse(value ?? "");
           if (v == null) return '請輸入數值';
           return null;
-        },
-        onChanged: (value) {
-          final v = double.tryParse(value);
-          if (v != null) onChanged(v);
         },
       ),
     );
