@@ -105,10 +105,12 @@ class _SettingsDialogState extends State<SettingsDialog> {
                         ElevatedButton.styleFrom(backgroundColor: Colors.red),
                     onPressed: isLogging
                         ? () async {
-                            await widget.onStopLogging();
-                            setState(() {
-                              isLogging = widget.sampler.getLoggingStat();
-                            });
+                            final ok = await widget.onStopLogging();
+                            if (ok) {
+                              setState(() {
+                                isLogging = widget.sampler.getLoggingStat();
+                              });
+                            }
                           }
                         : null,
                   ),
