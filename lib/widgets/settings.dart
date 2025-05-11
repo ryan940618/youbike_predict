@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
-import 'package:file_picker/file_picker.dart';
 import 'package:youbike_predict/services/sampler.dart';
 
 class SettingsDialog extends StatefulWidget {
   final Sampler sampler;
-  final VoidCallback onStartLogging;
-  final VoidCallback onStopLogging;
+  final Future<void> Function() onStartLogging;
+  final Future<void> Function() onStopLogging;
   final void Function() onImport;
 
   const SettingsDialog({
@@ -91,9 +89,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
                     label: const Text("啟用"),
                     onPressed: !isLogging
                         ? () async {
-                            await widget.onStartLogging;
+                            await widget.onStartLogging();
                             setState(() {
-                              isLogging = true;
+                              isLogging = widget.sampler.getLoggingStat();
                             });
                           }
                         : null,
@@ -105,9 +103,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
                         ElevatedButton.styleFrom(backgroundColor: Colors.red),
                     onPressed: isLogging
                         ? () async {
-                            await widget.onStopLogging;
+                            await widget.onStopLogging();
                             setState(() {
-                              isLogging = false;
+                              isLogging = widget.sampler.getLoggingStat();
                             });
                           }
                         : null,

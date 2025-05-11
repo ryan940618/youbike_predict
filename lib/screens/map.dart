@@ -144,7 +144,7 @@ class _MapPageState extends State<MapPage> {
         onStartLogging: () async {
           sampler.startLogging();
         },
-        onStopLogging: () {
+        onStopLogging: () async {
           sampler.stopLogging();
         },
         onImport: () async {
