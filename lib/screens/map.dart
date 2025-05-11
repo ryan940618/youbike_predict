@@ -142,10 +142,12 @@ class _MapPageState extends State<MapPage> {
       builder: (context) => SettingsDialog(
         sampler: sampler,
         onStartLogging: () async {
-          sampler.startLogging();
+          final success = await sampler.startLogging(); // 修改這邊回傳 bool
+          return success;
         },
         onStopLogging: () async {
-          sampler.stopLogging();
+          final success = await sampler.stopLogging();
+          return success;
         },
         onImport: () async {
           await LoggerService.importFromFile();

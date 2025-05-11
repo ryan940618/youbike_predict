@@ -3,8 +3,8 @@ import 'package:youbike_predict/services/sampler.dart';
 
 class SettingsDialog extends StatefulWidget {
   final Sampler sampler;
-  final Future<void> Function() onStartLogging;
-  final Future<void> Function() onStopLogging;
+  final Future<bool> Function() onStartLogging;
+  final Future<bool> Function() onStopLogging;
   final void Function() onImport;
 
   const SettingsDialog({
@@ -89,10 +89,12 @@ class _SettingsDialogState extends State<SettingsDialog> {
                     label: const Text("啟用"),
                     onPressed: !isLogging
                         ? () async {
-                            await widget.onStartLogging();
-                            setState(() {
-                              isLogging = widget.sampler.getLoggingStat();
-                            });
+                            final ok = await widget.onStartLogging();
+                            if (ok) {
+                              setState(() {
+                                isLogging = widget.sampler.getLoggingStat();
+                              });
+                            }
                           }
                         : null,
                   ),

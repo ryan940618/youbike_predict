@@ -47,11 +47,12 @@ class Sampler {
     });
   }
 
-  void startLogging() async {
+  Future<bool> startLogging() async {
     final success = await LoggerService.initLogFile();
-    if (!success) return;
+    if (!success) return false;
 
     _isLogging = true;
+    return true;
   }
 
   void _performLogging(
@@ -94,9 +95,10 @@ class Sampler {
     onLog("Logged 站點數量：${results.length} @ ${DateTime.now()}");
   }
 
-  void stopLogging() async {
+  Future<bool> stopLogging() async {
     await LoggerService.closeLog();
     _isLogging = false;
+    return true;
   }
 
   List<LatLng> generatePoints(double minLat, double maxLat, double minLon,
