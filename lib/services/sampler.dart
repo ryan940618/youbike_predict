@@ -12,7 +12,7 @@ class Sampler {
   int _interval = 16000;
   Duration period = const Duration(minutes: 1);
 
-  bool getLoggingStat(){
+  bool getLoggingStat() {
     return _isLogging;
   }
 
@@ -34,15 +34,10 @@ class Sampler {
     _interval = config["interval"];
   }
 
-  void startLogging({
+  void startJob({
     required void Function(String log) onLog,
     required void Function(List<Map<String, dynamic>>) onStationsUpdated,
   }) {
-    if (_isLogging) {
-      _timer!.cancel();
-    }
-    _isLogging = true;
-
     _performLogging(_minLat, _maxLat, _minLon, _maxLon, _interval, onLog,
         onStationsUpdated);
 
@@ -50,6 +45,13 @@ class Sampler {
       _performLogging(_minLat, _maxLat, _minLon, _maxLon, _interval, onLog,
           onStationsUpdated);
     });
+  }
+
+  void startLogging() async {
+    final success = await LoggerService.initLogFile();
+    if (!success) return;
+
+    _isLogging = true;
   }
 
   void _performLogging(
@@ -92,7 +94,8 @@ class Sampler {
     onLog("Logged 站點數量：${results.length} @ ${DateTime.now()}");
   }
 
-  void stopLogging() {
+  void stopLogging() async {
+    await LoggerService.closeLog();
     _isLogging = false;
   }
 

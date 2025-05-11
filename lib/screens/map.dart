@@ -44,7 +44,7 @@ class _MapPageState extends State<MapPage> {
       return stations;
     });
 
-    sampler.startLogging(
+    sampler.startJob(
       onLog: (msg) => print("[Log]$msg"),
       onStationsUpdated: onStationsUpdated,
     );
@@ -142,13 +142,7 @@ class _MapPageState extends State<MapPage> {
       builder: (context) => SettingsDialog(
         sampler: sampler,
         onStartLogging: () async {
-          final ok = await LoggerService.initLogFile();
-          if (!ok) return;
-
-          sampler.startLogging(
-            onLog: (msg) => print("[Log]$msg"),
-            onStationsUpdated: onStationsUpdated,
-          );
+          sampler.startLogging();
         },
         onStopLogging: () {
           sampler.stopLogging();

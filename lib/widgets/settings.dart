@@ -90,8 +90,11 @@ class _SettingsDialogState extends State<SettingsDialog> {
                     icon: const Icon(Icons.play_arrow),
                     label: const Text("啟用"),
                     onPressed: !isLogging
-                        ? () {
-                            widget.onStartLogging();
+                        ? () async {
+                            await widget.onStartLogging;
+                            setState(() {
+                              isLogging = true;
+                            });
                           }
                         : null,
                   ),
@@ -100,7 +103,14 @@ class _SettingsDialogState extends State<SettingsDialog> {
                     label: const Text("停用"),
                     style:
                         ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                    onPressed: isLogging ? widget.onStopLogging : null,
+                    onPressed: isLogging
+                        ? () async {
+                            await widget.onStopLogging;
+                            setState(() {
+                              isLogging = false;
+                            });
+                          }
+                        : null,
                   ),
                 ],
               ),

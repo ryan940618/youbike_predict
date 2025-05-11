@@ -5,33 +5,50 @@ import 'package:file_picker/file_picker.dart';
 import 'analyzer.dart';
 
 class LoggerService {
-  static File? filePath;
+  static String? directoryPath;
+  static int lineCount = 0;
+  static int fileIndex = 1;
+  static IOSink? _currentSink;
 
   static Future<bool> initLogFile() async {
-    final saveLocation = await getSaveLocation(
-      suggestedName: 'log.json',
-      acceptedTypeGroups: [
-        const XTypeGroup(label: 'JSON', extensions: ['json']),
-      ],
-    );
+    final directory = await FilePicker.platform.getDirectoryPath();
+    if (directory == null) return false;
+    directoryPath = directory;
+    lineCount = 0;
+    fileIndex = 1;
 
-    if (saveLocation == null) return false;
-
-    filePath = File(saveLocation.path);
+    await _createNewLogFile();
     return true;
   }
 
-  static Future<void> writeLog(List<Map<String, dynamic>> data) async {
-    if (filePath == null) return;
+  static Future<void> _createNewLogFile() async {
+    final timestamp = DateTime.now().toIso8601String().replaceAll(":", "-");
+    final filename = 'ubikeData_${timestamp}_$fileIndex.json';
+    final path = '$directoryPath/$filename';
 
-    final sink = filePath!.openWrite(mode: FileMode.append);
+    _currentSink?.close();
+    _currentSink = File(path).openWrite(mode: FileMode.write);
+  }
+
+  static Future<void> closeLog() async {
+    await _currentSink?.flush();
+    await _currentSink?.close();
+    _currentSink = null;
+  }
+
+  static Future<void> writeLog(List<Map<String, dynamic>> data) async {
+    if (_currentSink == null) return;
 
     for (var entry in data) {
-      sink.writeln(jsonEncode(entry));
-    }
+      _currentSink!.writeln(jsonEncode(entry));
+      lineCount++;
 
-    await sink.flush();
-    await sink.close();
+      if (lineCount >= 100) {
+        lineCount = 0;
+        fileIndex++;
+        await _createNewLogFile();
+      }
+    }
   }
 
   static Future<void> importFromFile() async {
