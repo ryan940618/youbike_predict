@@ -4,7 +4,7 @@ import 'package:youbike_predict/services/sampler.dart';
 class SettingsDialog extends StatefulWidget {
   final Sampler sampler;
   final Future<bool> Function() onStartLogging;
-  final Future<bool> Function() onStopLogging;
+  final Future<void> Function() onStopLogging;
   final void Function() onImport;
 
   const SettingsDialog({
@@ -76,14 +76,14 @@ class _SettingsDialogState extends State<SettingsDialog> {
               _buildDoubleField("Max Longitude", _maxLonController),
               _buildDoubleField("間距密度(m)", _intervalController),
               const SizedBox(height: 20),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.mark_chat_read_rounded),
+                label: const Text("套用設定"),
+                onPressed: _applyNewConfig,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.mark_chat_read_rounded),
-                    label: const Text("套用設定"),
-                    onPressed: _applyNewConfig,
-                  ),
                   ElevatedButton.icon(
                     icon: const Icon(Icons.play_arrow),
                     label: const Text("啟用"),
@@ -105,12 +105,10 @@ class _SettingsDialogState extends State<SettingsDialog> {
                         ElevatedButton.styleFrom(backgroundColor: Colors.red),
                     onPressed: isLogging
                         ? () async {
-                            final ok = await widget.onStopLogging();
-                            if (ok) {
-                              setState(() {
-                                isLogging = widget.sampler.getLoggingStat();
-                              });
-                            }
+                            await widget.onStopLogging();
+                            setState(() {
+                              isLogging = widget.sampler.getLoggingStat();
+                            });
                           }
                         : null,
                   ),

@@ -4,7 +4,7 @@ import 'dart:convert';
 
 Future<List<Station>> fetchStations() async {
   //final res = await http.get(Uri.parse("https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092"));
-  final res = await http.get(Uri.parse("http://localhost/alt.json"));
+  final res = await http.get(Uri.parse("https://web.archive.org/web/20210305163059if_/https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092"));
 
   final data = json.decode(res.body);
   List<Station> stations = [];

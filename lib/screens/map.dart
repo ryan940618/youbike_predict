@@ -146,8 +146,7 @@ class _MapPageState extends State<MapPage> {
           return success;
         },
         onStopLogging: () async {
-          final success = await sampler.stopLogging();
-          return success;
+          await sampler.stopLogging();
         },
         onImport: () async {
           await LoggerService.importFromFile();

@@ -12,7 +12,13 @@ class LoggerService {
   static Future<bool> initLogFile() async {
     final directory = await FilePicker.platform.getDirectoryPath();
     if (directory == null) return false;
-    directoryPath = directory;
+
+    final parts = directory.split(Platform.pathSeparator);
+  if (parts.length >= 2 && parts[parts.length - 1] == parts[parts.length - 2]) {
+    parts.removeLast();
+  }
+
+    directoryPath = parts.join(Platform.pathSeparator);
     lineCount = 0;
     fileIndex = 1;
 
@@ -21,6 +27,8 @@ class LoggerService {
   }
 
   static Future<void> _createNewLogFile() async {
+    if (directoryPath == null) return;
+
     final timestamp = DateTime.now().toIso8601String().replaceAll(":", "-");
     final filename = 'ubikeData_${timestamp}_$fileIndex.json';
     final path = '$directoryPath/$filename';

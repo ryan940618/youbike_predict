@@ -95,10 +95,9 @@ class Sampler {
     onLog("Logged 站點數量：${results.length} @ ${DateTime.now()}");
   }
 
-  Future<bool> stopLogging() async {
+  Future<void> stopLogging() async {
     await LoggerService.closeLog();
     _isLogging = false;
-    return true;
   }
 
   List<LatLng> generatePoints(double minLat, double maxLat, double minLon,
