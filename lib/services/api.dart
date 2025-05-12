@@ -3,17 +3,16 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 Future<List<Station>> fetchStations() async {
-  //final res = await http.get(Uri.parse("https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092"));
-  final res = await http.get(Uri.parse("https://web.archive.org/web/20210305163059if_/https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092"));
+  final res = await http.get(Uri.parse(
+      "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092"));
 
-  final data = json.decode(res.body);
+  final response = json.decode(res.body);
+  final rawData = response['data']['data'];
+  final data = json.decode(rawData);
+
   List<Station> stations = [];
-  /*
-  for (var item in data['data']['data']['retVal']) {
-    stations.add(Station.listJson(item));
-  }*/
 
-  for (var item in data['data']['retVal']) {
+  for (var item in data['retVal']) {
     stations.add(Station.listJson(item));
   }
 
