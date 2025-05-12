@@ -9,7 +9,7 @@ class Sampler {
 
   double _minLat = 22.465504, _maxLat = 23.099788;
   double _minLon = 120.172277, _maxLon = 120.613318;
-  int _interval = 16000;
+  double _interval = 16000;
   Duration period = const Duration(minutes: 1);
 
   bool getLoggingStat() {
@@ -60,7 +60,7 @@ class Sampler {
     double maxLat,
     double minLon,
     double maxLon,
-    int interval,
+    double interval,
     void Function(String log) onLog,
     void Function(List<Map<String, dynamic>>) onStationsUpdated,
   ) async {
@@ -101,7 +101,7 @@ class Sampler {
   }
 
   List<LatLng> generatePoints(double minLat, double maxLat, double minLon,
-      double maxLon, int intervalMeter) {
+      double maxLon, double intervalMeter) {
     // 把 interval (meter) 轉成經緯度位移，然後產生網格點
     // 約略換算：1 度緯度 ≈ 111000 公尺
     final delta = intervalMeter / 111000;
