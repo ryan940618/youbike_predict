@@ -13,12 +13,7 @@ class LoggerService {
     final directory = await FilePicker.platform.getDirectoryPath();
     if (directory == null) return false;
 
-    final parts = directory.split(Platform.pathSeparator);
-  if (parts.length >= 2 && parts[parts.length - 1] == parts[parts.length - 2]) {
-    parts.removeLast();
-  }
-
-    directoryPath = parts.join(Platform.pathSeparator);
+    directoryPath = directory;
     lineCount = 0;
     fileIndex = 1;
 
