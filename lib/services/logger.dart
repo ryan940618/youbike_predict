@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'analyzer.dart';
+import 'package:path_provider/path_provider.dart';
 
 class LoggerService {
   static String? directoryPath;
@@ -10,10 +11,17 @@ class LoggerService {
   static IOSink? _currentSink;
 
   static Future<bool> initLogFile() async {
-    final directory = await FilePicker.platform.getDirectoryPath();
-    if (directory == null) return false;
+    if (Platform.isAndroid) {
+      final dir = await getExternalStorageDirectory();
+      if (dir == null) return false;
 
-    directoryPath = directory;
+      directoryPath = dir.path;
+    } else {
+      final pickedPath = await FilePicker.platform.getDirectoryPath();
+      if (pickedPath == null) return false;
+
+      directoryPath = pickedPath;
+    }
     lineCount = 0;
     fileIndex = 1;
 
@@ -51,6 +59,7 @@ class LoggerService {
         await _createNewLogFile();
       }
     }
+    await _currentSink?.flush();
   }
 
   static Future<void> importFromFile() async {
