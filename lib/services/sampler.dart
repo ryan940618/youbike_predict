@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:latlong2/latlong.dart';
-import '../services/api.dart';
-import '../services/logger.dart';
+import 'api.dart';
+import 'logger.dart';
 
 class Sampler {
   static Timer? _timer;
