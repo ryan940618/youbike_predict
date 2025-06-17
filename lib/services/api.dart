@@ -7,8 +7,7 @@ Future<List<Station>> fetchStations() async {
       "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092"));
 
   final response = json.decode(res.body);
-  final rawData = response['data']['data'];
-  final data = json.decode(rawData);
+  final data = response['data']['data'];
 
   List<Station> stations = [];
 
