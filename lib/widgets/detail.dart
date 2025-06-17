@@ -69,16 +69,42 @@ class StationDetail extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          HourlyHistogram(
-            data: Analyzer.getHourlyAvg(stationData['station_no']),
-            title: "每小時平均可借車數",
-            color: Colors.green,
+          FutureBuilder<Map<int, double>>(
+            future: Analyzer.getHourlyAvg(stationData['station_no']),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text("錯誤: ${snapshot.error}");
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Text("沒有資料");
+              }
+
+              return HourlyHistogram(
+                data: snapshot.data!,
+                title: "每小時平均可借車數",
+                color: Colors.green,
+              );
+            },
           ),
           const SizedBox(height: 12),
-          HourlyHistogram(
-            data: Analyzer.getHourlyAvgDelta(stationData['station_no']),
-            title: "每小時車輛流動量",
-            color: Colors.orange,
+          FutureBuilder<Map<int, double>>(
+            future: Analyzer.getHourlyAvgDelta(stationData['station_no']),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text("錯誤: ${snapshot.error}");
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Text("沒有資料");
+              }
+
+              return HourlyHistogram(
+                data: snapshot.data!,
+                title: "每小時車輛流動量",
+                color: Colors.orange,
+              );
+            },
           ),
         ],
       ),

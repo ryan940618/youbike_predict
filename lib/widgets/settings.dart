@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:youbike_predict/services/sampler.dart';
+import '../services/analyzer.dart';
 
 class SettingsDialog extends StatefulWidget {
   final Sampler sampler;
   final Future<bool> Function() onStartLogging;
   final Future<void> Function() onStopLogging;
-  final void Function() onImport;
 
   const SettingsDialog({
     super.key,
     required this.sampler,
     required this.onStartLogging,
     required this.onStopLogging,
-    required this.onImport,
   });
 
   @override
@@ -28,7 +27,9 @@ class _SettingsDialogState extends State<SettingsDialog> {
   final _maxLonController = TextEditingController();
   final _intervalController = TextEditingController();
 
+  final _urlController = TextEditingController();
   late double minLat, maxLat, minLon, maxLon, interval;
+  late String baseurl;
   bool isLogging = false;
 
   @override
@@ -41,12 +42,14 @@ class _SettingsDialogState extends State<SettingsDialog> {
     minLon = config['minLon'];
     maxLon = config['maxLon'];
     interval = config['interval'].toDouble();
+    baseurl = Analyzer.getBaseUrl();
 
     _minLatController.text = minLat.toString();
     _maxLatController.text = maxLat.toString();
     _minLonController.text = minLon.toString();
     _maxLonController.text = maxLon.toString();
     _intervalController.text = interval.toString();
+    _urlController.text = baseurl;
 
     isLogging = widget.sampler.getLoggingStat();
   }
@@ -115,12 +118,13 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 ],
               ),
               const SizedBox(height: 16),
-              const SizedBox(height: 8),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.upload),
-                label: const Text("匯入"),
-                onPressed: () async {
-                  widget.onImport();
+              TextField(
+                controller: _urlController,
+                decoration: const InputDecoration(
+                  labelText: "資料庫API位置",
+                ),
+                onChanged: (value) {
+                  Analyzer.setBaseUrl(value);
                 },
               ),
             ],

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import '../services/logger.dart';
 import '../services/sampler.dart';
 import '../widgets/settings.dart';
 import '../services/api.dart';
@@ -147,12 +146,6 @@ class _MapPageState extends State<MapPage> {
         },
         onStopLogging: () async {
           await sampler.stopLogging();
-        },
-        onImport: () async {
-          await LoggerService.importFromFile();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("匯入完成")),
-          );
         },
       ),
     );

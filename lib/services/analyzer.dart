@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
+import 'package:http/http.dart' as http;
 
 class StationLog {
   final DateTime timestamp;
@@ -10,83 +10,43 @@ class StationLog {
 }
 
 class Analyzer {
-  static Map<String, List<StationLog>> _importedData = {};
-  bool get isDataLoaded => _importedData.isNotEmpty;
+  static String _baseUrl = "http://localhost:5000";
 
-  Future<void> loadFromFile(File file) async {
-    final lines = await file.readAsLines();
+  static String getBaseUrl() {
+    return _baseUrl;
+  }
 
-    for (var line in lines) {
-      try {
-        final data = jsonDecode(line);
-        final timestamp = DateTime.parse(data['timestamp']);
-        final stations = List<Map<String, dynamic>>.from(data['stations']);
+  static setBaseUrl(String url) {
+    _baseUrl = url;
+  }
 
-        for (var station in stations) {
-          final stationNo = station['station_no'];
-          final available = station['available_spaces'];
-
-          _importedData.putIfAbsent(stationNo, () => []);
-          _importedData[stationNo]!.add(
-            StationLog(timestamp: timestamp, availableSpaces: available),
-          );
-        }
-      } catch (e) {
-        print("解析失敗：$e");
-      }
+  static Future<Map<int, double>> getHourlyAvg(String stationNo) async {
+    final response =
+        await http.get(Uri.parse("$_baseUrl/api/hourly_avg/$stationNo"));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return data
+          .map((key, value) => MapEntry(int.parse(key), value.toDouble()));
+    } else {
+      throw Exception("Failed to load hourly average data");
     }
   }
 
-  static Map<int, double> getHourlyAvg(
-    String stationNo,
-  ) {
-    final logs = _importedData[stationNo];
-    if (logs == null || logs.isEmpty) return {};
-
-    final Map<int, List<int>> hourlyValues = {};
-
-    for (var log in logs) {
-      final hour = log.timestamp.hour;
-      hourlyValues.putIfAbsent(hour, () => []).add(log.availableSpaces);
+  static Future<Map<int, double>> getHourlyAvgDelta(String stationNo) async {
+    final response =
+        await http.get(Uri.parse("$_baseUrl/api/hourly_delta/$stationNo"));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return data
+          .map((key, value) => MapEntry(int.parse(key), value.toDouble()));
+    } else {
+      throw Exception("Failed to load hourly delta data");
     }
-
-    return hourlyValues.map((hour, values) {
-      final avg = values.reduce((a, b) => a + b) / values.length;
-      return MapEntry(hour, avg);
-    });
   }
 
-  static Map<int, double> getHourlyAvgDelta(String stationNo) {
-    final logs = _importedData[stationNo];
-    if (logs == null || logs.length < 2) return {};
-
-    logs.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-    final Map<int, double> hourlyFlow = {};
-
-    for (int i = 1; i < logs.length; i++) {
-      final prev = logs[i - 1];
-      final curr = logs[i];
-
-      final sameHour = prev.timestamp.hour == curr.timestamp.hour &&
-          prev.timestamp.day == curr.timestamp.day &&
-          prev.timestamp.month == curr.timestamp.month &&
-          prev.timestamp.year == curr.timestamp.year;
-
-      if (!sameHour) continue;
-
-      final hour = curr.timestamp.hour;
-      final diff = (curr.availableSpaces - prev.availableSpaces).abs();
-
-      hourlyFlow[hour] = (hourlyFlow[hour] ?? 0) + diff;
-    }
-
-    return hourlyFlow;
-  }
-
-  static List<String> predictFutureLikely(String stationNo,
-      {int maxItems = 5}) {
-    final hourlyAvg = getHourlyAvg(stationNo);
+  static Future<List<String>> predictFutureLikely(String stationNo,
+      {int maxItems = 5}) async {
+    final hourlyAvg = await getHourlyAvg(stationNo);
     final sorted = hourlyAvg.entries.where((e) => e.value > 0).toList()
       ..sort((a, b) => a.value.compareTo(b.value));
 
