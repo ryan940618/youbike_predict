@@ -30,6 +30,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
   final _urlController = TextEditingController();
   late double minLat, maxLat, minLon, maxLon, interval;
   late String baseurl;
+  late bool allowUpload;
   bool isLogging = false;
 
   @override
@@ -43,6 +44,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
     maxLon = config['maxLon'];
     interval = config['interval'].toDouble();
     baseurl = Analyzer.getBaseUrl();
+    allowUpload = Analyzer.getUploadcfg();
 
     _minLatController.text = minLat.toString();
     _maxLatController.text = maxLat.toString();
@@ -87,6 +89,20 @@ class _SettingsDialogState extends State<SettingsDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
+                  CheckboxListTile(
+                    title: const Text('自動上傳至API'),
+                    value: allowUpload,
+                    onChanged: isLogging
+                        ? (bool? value) {
+                            if (value != null) {
+                              setState(() {
+                                allowUpload = value;
+                              });
+                              Analyzer.setUploadcfg(value);
+                            }
+                          }
+                        : null,
+                  ),
                   ElevatedButton.icon(
                     icon: const Icon(Icons.play_arrow),
                     label: const Text("啟用"),

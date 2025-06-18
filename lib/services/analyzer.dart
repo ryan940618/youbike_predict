@@ -21,6 +21,16 @@ class Analyzer {
     _baseUrl = url;
   }
 
+  static bool _allowUpload = false;
+
+  static bool getUploadcfg() {
+    return _allowUpload;
+  }
+
+  static setUploadcfg(bool value) {
+    _allowUpload = value;
+  }
+
   static Future<Map<int, double>> getHourlyAvg(String stationNo) async {
     final response =
         await http.get(Uri.parse("$_baseUrl/api/hourly_avg/$stationNo"));
@@ -145,21 +155,23 @@ class Analyzer {
   }
 
   static Future<void> uploadLogFile(File file) async {
-    try {
-      final url = Uri.parse('$_baseUrl/upload');
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: await file.readAsString(),
-      );
+    if (_allowUpload) {
+      try {
+        final url = Uri.parse('$_baseUrl/upload');
+        final response = await http.post(
+          url,
+          headers: {'Content-Type': 'application/json'},
+          body: await file.readAsString(),
+        );
 
-      if (response.statusCode == 200) {
-        print("上傳成功: ${file.path}");
-      } else {
-        print("上傳失敗: ${response.statusCode} ${response.body}");
+        if (response.statusCode == 200) {
+          print("上傳成功: ${file.path}");
+        } else {
+          print("上傳失敗: ${response.statusCode} ${response.body}");
+        }
+      } catch (e) {
+        print("上傳失敗: $e");
       }
-    } catch (e) {
-      print("上傳失敗: $e");
     }
   }
 }
