@@ -89,20 +89,6 @@ class _SettingsDialogState extends State<SettingsDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  CheckboxListTile(
-                    title: const Text('自動上傳至API'),
-                    value: allowUpload,
-                    onChanged: isLogging
-                        ? (bool? value) {
-                            if (value != null) {
-                              setState(() {
-                                allowUpload = value;
-                              });
-                              Analyzer.setUploadcfg(value);
-                            }
-                          }
-                        : null,
-                  ),
                   ElevatedButton.icon(
                     icon: const Icon(Icons.play_arrow),
                     label: const Text("啟用"),
@@ -132,6 +118,20 @@ class _SettingsDialogState extends State<SettingsDialog> {
                         : null,
                   ),
                 ],
+              ),
+              CheckboxListTile(
+                title: const Text('自動上傳至API'),
+                value: allowUpload,
+                onChanged: isLogging
+                    ? (bool? value) {
+                        if (value != null) {
+                          setState(() {
+                            allowUpload = value;
+                          });
+                          Analyzer.setUploadcfg(value);
+                        }
+                      }
+                    : null,
               ),
               const SizedBox(height: 16),
               TextField(
