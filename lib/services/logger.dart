@@ -2,12 +2,14 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'analyzer.dart';
 
 class LoggerService {
   static String? directoryPath;
   static int lineCount = 0;
   static int fileIndex = 1;
   static IOSink? _currentSink;
+  static File? _currentLogFile;
 
   static Future<bool> initLogFile() async {
     if (Platform.isAndroid) {
@@ -36,7 +38,9 @@ class LoggerService {
     final path = '$directoryPath/$filename';
 
     _currentSink?.close();
-    _currentSink = File(path).openWrite(mode: FileMode.write);
+
+    _currentLogFile = File(path);
+    _currentSink = _currentLogFile!.openWrite(mode: FileMode.write);
   }
 
   static Future<void> closeLog() async {
@@ -53,6 +57,13 @@ class LoggerService {
       lineCount++;
 
       if (lineCount >= 100) {
+        await _currentSink?.flush();
+        await _currentSink?.close();
+
+        if (_currentLogFile != null) {
+          await Analyzer.uploadLogFile(_currentLogFile!);
+        }
+
         lineCount = 0;
         fileIndex++;
         await _createNewLogFile();

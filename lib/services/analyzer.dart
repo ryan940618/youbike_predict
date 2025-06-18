@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
+import 'dart:io';
 
 class StationLog {
   final DateTime timestamp;
@@ -141,5 +142,24 @@ class Analyzer {
 
       return "$name(${distance}m)\n車輛數:$available/$total (YouBike 2.0: $yb2 電輔車: $eyb)";
     }).toList();
+  }
+
+  static Future<void> uploadLogFile(File file) async {
+    try {
+      final url = Uri.parse('$_baseUrl/upload');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: await file.readAsString(),
+      );
+
+      if (response.statusCode == 200) {
+        print("上傳成功: ${file.path}");
+      } else {
+        print("上傳失敗: ${response.statusCode} ${response.body}");
+      }
+    } catch (e) {
+      print("上傳失敗: $e");
+    }
   }
 }
