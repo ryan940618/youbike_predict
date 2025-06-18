@@ -32,7 +32,7 @@ def upload():
         filename = f'data_{timestamp.replace(":", "-")}.json'
         path = os.path.join(DATASET_FOLDER, filename)
 
-        with open(path, 'w', encoding='utf-8') as f:
+        with open(path, 'w', encoding='utf-8', newline='') as f:
             f.write(raw_body)
 
         with open(path, 'r', encoding='utf-8') as f:
