@@ -26,15 +26,17 @@ with app.app_context():
 @app.route('/upload', methods=['POST'])
 def upload():
     try:
-        data = request.get_json()
-        timestamp = data.get('timestamp', datetime.now().isoformat())
-        filename = f'data_{timestamp.replace(":", "-")}.jsonl'
+        raw_body = request.get_data(as_text=True)
+
+        timestamp = datetime.now().isoformat()
+        filename = f'data_{timestamp.replace(":", "-")}.json'
         path = os.path.join(DATASET_FOLDER, filename)
 
-        with open(path, 'w') as f:
-            json.dump(data, f)
+        with open(path, 'w', encoding='utf-8') as f:
+            f.write(raw_body)
 
-        analyzer.load_from_file(open(path, 'r'))
+        with open(path, 'r', encoding='utf-8') as f:
+            analyzer.load_from_file(f)
 
         return jsonify({"status": "ok", "saved": filename}), 200
     except Exception as e:
