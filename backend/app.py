@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import os
 import json
 from datetime import datetime
 from analyzer import Analyzer
 
 app = Flask(__name__)
+CORS(app)
 
 DATASET_FOLDER = 'dataset'
 os.makedirs(DATASET_FOLDER, exist_ok=True)
