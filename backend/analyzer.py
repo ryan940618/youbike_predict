@@ -79,21 +79,17 @@ class Analyzer:
             return {}
 
         logs.sort(key=lambda l: l.timestamp)
+
+        hourly_groups = defaultdict(list)
+
+        for log in logs:
+            key = (log.timestamp.date(), log.timestamp.hour)
+            hourly_groups[key].append(log.available_spaces)
+
         hourly_flow = defaultdict(float)
-
-        for i in range(1, len(logs)):
-            prev = logs[i - 1]
-            curr = logs[i]
-
-            same_hour = (
-                prev.timestamp.hour == curr.timestamp.hour and
-                prev.timestamp.date() == curr.timestamp.date()
-            )
-            if not same_hour:
-                continue
-
-            hour = curr.timestamp.hour
-            diff = abs(curr.available_spaces - prev.available_spaces)
-            hourly_flow[hour] += diff
+        for (date, hour), values in hourly_groups.items():
+            if len(values) >= 2:
+                flow = abs(values[-1] - values[0])
+                hourly_flow[hour] += flow
 
         return {hour: round(flow, 2) for hour, flow in hourly_flow.items()}
